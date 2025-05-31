@@ -1,16 +1,9 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(taurob_arm_description)
 
-
-find_package(catkin REQUIRED)
-
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES argo_arm_description
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
-)
+find_package(ament_cmake REQUIRED)
 
 install(DIRECTORY urdf meshes
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+  DESTINATION share/${PROJECT_NAME}
 )
+ament_package()

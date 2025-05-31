@@ -1,27 +1,27 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.8)
 project(taurob_tracker_description)
 
-## Find catkin macros and libraries
-## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
-## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  hector_components_description
-  hector_xacro_tools
-  urdf
-  xacro
-)
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES taurob_tracker_description
-#  CATKIN_DEPENDS hector_components_description hector_xacro_tools urdf xacro
-#  DEPENDS system_lib
-)
+# find dependencies
+find_package(ament_cmake REQUIRED)
 
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  # the following line skips the linter which checks for copyrights
+  # comment the line when a copyright and license is added to all source files
+  set(ament_cmake_copyright_FOUND TRUE)
+  # the following line skips cpplint (only works in a git repo)
+  # comment the line when this package is in a git repo and when
+  # a copyright and license is added to all source files
+  set(ament_cmake_cpplint_FOUND TRUE)
+  ament_lint_auto_find_test_dependencies()
+endif()
 
-install(DIRECTORY urdf meshes launch rviz
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+install(
+    DIRECTORY urdf meshes launch rviz
+    DESTINATION share/${PROJECT_NAME}
 )
+ament_package()

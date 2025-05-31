@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
 <robot     xmlns:xacro="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
   
-  <property name="M_PI" value="3.14159265359"/>
-  
   <xacro:include filename="$(find hector_xacro_tools)/urdf/inertia_tensors.urdf.xacro" />
   
   <!--Instantiates arm with 3 first joints without ros_control plugin-->
-  <macro name="taurob_arm_base_no_gazebo_ros_control_macro" params="parent *origin">    
+  <xacro:macro name="taurob_arm_base_no_gazebo_ros_control_macro" params="parent *origin">    
     
     <joint name="arm_joint_0" type="revolute">    
-      <insert_block name="origin"/>
+      <xacro:insert_block name="origin"/>
       <axis xyz="0 0 1"/>
-      <limit lower="${-180 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${-180 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       <parent link="${parent}"/>
@@ -40,9 +38,9 @@
     <joint name="arm_joint_1" type="revolute">    
       <origin xyz="-0.067 0.0 0.06" rpy="0 0 0"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${0 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${0 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -71,9 +69,9 @@
     <joint name="arm_joint_2" type="revolute">    
       <origin xyz="0.022 0.551 0.0" rpy="0 0 0"/>
       <axis xyz="-1 0 0"/>
-      <limit lower="${0 * M_PI / 180}" upper="${175 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${0 * pi / 180}" upper="${175 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       <parent link="arm_link_1"/>
@@ -144,16 +142,16 @@
       <material>Gazebo/Grey</material>
     </gazebo>
     
-  </macro>
+  </xacro:macro>
   
-  <macro name="taurob_arm_base_no_gazebo_ros_control_with_calibration_macro" params="parent *origin">    
+  <xacro:macro name="taurob_arm_base_no_gazebo_ros_control_with_calibration_macro" params="parent *origin">    
     
     <joint name="arm_joint_0" type="revolute">    
-      <insert_block name="origin"/>
+      <xacro:insert_block name="origin"/>
       <axis xyz="0 0 1"/>
-      <limit lower="${-180 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${-180 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       <parent link="${parent}"/>
@@ -180,9 +178,9 @@
     <joint name="arm_joint_1" type="revolute">    
       <origin xyz="-0.067 0.0 0.06" rpy="${arm_joint_1_offset} 0 0"/>
       <axis xyz="1 0 0"/>
-      <limit lower="${0 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${0 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -211,9 +209,9 @@
     <joint name="arm_joint_2" type="revolute">    
       <origin xyz="0.022 0.551 0.0" rpy="${arm_joint_2_offset} 0 0"/>
       <axis xyz="-1 0 0"/>
-      <limit lower="${0 * M_PI / 180}" upper="${175 * M_PI / 180}" effort="1000" velocity="${1.0 * 30 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${0 * pi / 180}" upper="${175 * pi / 180}" effort="1000" velocity="${1.0 * 30 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       <parent link="arm_link_1"/>
@@ -284,11 +282,11 @@
       <material>Gazebo/Grey</material>
     </gazebo>
     
-  </macro>
+  </xacro:macro>
   
   
   <!--Instantiates arm with 3 first joints ros_control plugin for them-->
-  <macro name="taurob_arm_base_macro" params="parent *origin"> 
+  <xacro:macro name="taurob_arm_base_macro" params="parent *origin"> 
     
     <xacro:taurob_arm_base_no_gazebo_ros_control_macro parent="${parent}">
        <xacro:insert_block name="origin" />
@@ -302,10 +300,10 @@
       </plugin>
     </gazebo>
     
-  </macro>
+  </xacro:macro>
   
   
-  <macro name="taurob_arm_simple_eef_macro" params="parent *origin">
+  <xacro:macro name="taurob_arm_simple_eef_macro" params="parent *origin">
     
     <xacro:taurob_arm_base_macro parent="${parent}">  
       <xacro:insert_block name="origin"/>
@@ -313,9 +311,9 @@
     <joint name="arm_joint_3" type="revolute">    
       <origin xyz="0.096 -0.42 0" rpy=" 0 0 0"/>
       <axis xyz="-1 0 0"/>
-      <limit lower="${-180 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${-180 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -356,10 +354,10 @@
     <gazebo reference="arm_link_3">
       <material>Gazebo/Grey</material>
     </gazebo>  
-  </macro>
+  </xacro:macro>
   
   
-  <macro name="taurob_arm_with_gripper_macro" params="parent *origin">
+  <xacro:macro name="taurob_arm_with_gripper_macro" params="parent *origin">
     
     <xacro:taurob_arm_base_macro parent="${parent}">  
       <xacro:insert_block name="origin"/>
@@ -367,11 +365,11 @@
       
     
     <joint name="arm_joint_3" type="revolute">    
-      <origin xyz="0.096 -0.435 -0.013" rpy=" 0 0 ${-90 * M_PI / 180}"/>
+      <origin xyz="0.096 -0.435 -0.013" rpy=" 0 0 ${-90 * pi / 180}"/>
       <axis xyz="0 -1 0"/>
-      <limit lower="${-180 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${-180 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -386,7 +384,7 @@
       
       <visual>
         <!--       
-        <origin xyz="0.0 0.0 0.0" rpy="0 0 ${M_PI}"/>
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 ${pi}"/>
         <geometry>
         <mesh filename="package://taurob_arm_description/meshes/claw_base_link.stl"/>
         </geometry>
@@ -408,9 +406,9 @@
    <joint name="arm_joint_4" type="continuous">    
       <origin xyz="0.16317 0.04054 0.04882" rpy=" 0 0 0"/>
       <axis xyz="-1 0 0"/>
-      <limit lower="${-180 * M_PI / 180}" upper="${180 * M_PI / 180}" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="${-180 * pi / 180}" upper="${180 * pi / 180}" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -440,9 +438,9 @@
     <joint name="gripper_joint_0" type="revolute">    
       <origin xyz="-0.07 -0.03 0.035" rpy=" 0 0 -1.9"/>
       <axis xyz="0 0 1"/>
-      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -469,12 +467,12 @@
     </link>
 
     <joint name="gripper_joint_1" type="revolute">    
-      <origin xyz="0.075 0 -0.035" rpy=" ${M_PI} 0 1.9"/>
+      <origin xyz="0.075 0 -0.035" rpy=" ${pi} 0 1.9"/>
       <axis xyz="0 0 1"/>
-      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
+      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
       <mimic joint="gripper_joint_0" />
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -504,7 +502,7 @@
     <joint name="gripper_joint_0_1" type="revolute">    
       <origin xyz="-0.07 0.03 0.035" rpy=" 0 0 1.9"/>
       <axis xyz="0 0 -1"/>
-      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
+      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
       <mimic joint="gripper_joint_0" />
       <parent link="arm_link_4"/>
       <child link="gripper_link_1_1"/>
@@ -531,10 +529,10 @@
     <joint name="gripper_joint_1_1" type="revolute">    
       <origin xyz="0.075 0 -0.035" rpy="0 0 -1.9"/>
       <axis xyz="0 0 1"/>
-      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * M_PI / 180}"/>
+      <limit lower="0" upper="1.89" effort="1000" velocity="${1.0 * 110 * pi / 180}"/>
       <mimic joint="gripper_joint_0" />
-      <!--        <safety_controller soft_lower_limit="${-168 * M_PI / 180}"
-      soft_upper_limit="${168 * M_PI / 180}"
+      <!--        <safety_controller soft_lower_limit="${-168 * pi / 180}"
+      soft_upper_limit="${168 * pi / 180}"
       k_position="${100}"
       k_velocity="${2}"/>-->
       
@@ -659,6 +657,6 @@
         <joints>arm_joint_4 gripper_joint_0 gripper_joint_1 gripper_joint_1_1 gripper_joint_0_1</joints>
       </plugin>
     </gazebo>
-  </macro>
+  </xacro:macro>
 
 </robot>
