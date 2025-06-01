@@ -46,7 +46,7 @@ def disable_collisions(panda, linkA, linkB):
 def buildScene():
 
     #add ground
-    ground = agxCollide.Geometry(agxCollide.Box(3, 3, 0.1))
+    ground = agxCollide.Geometry(agxCollide.Box(30, 30, 0.1))
     ground.setPosition(agx.Vec3(0, 0, -0.1))
     ground.setName("ground")
     simulation().add(ground)
@@ -55,7 +55,7 @@ def buildScene():
 
     # The robot
     #
-    taurob = Taurob(simulation(), disable_self_collision=False)
+    taurob = Taurob(sim=simulation(), disable_self_collision=False)
     #panda = Panda(simulation(), use_tool=True, disable_self_collision=False)
 
     # sets maximum torque
@@ -69,6 +69,39 @@ def buildScene():
 #    simulation().getSpace().setEnablePair(panda.assembly.getName(), panda.assembly.getName(), False)
 #    print("robot ", panda.assembly.getName())
 #    print("ground ",ground.getName())
+    
+    #set contact materials
+    trackMaterial = agx.Material('track')
+    wheelMaterial = agx.Material('wheel')
+    groundMaterial = agx.Material('ground')
+
+    trackWheelContactMaterial = simulation().getMaterialManager().getOrCreateContactMaterial(trackMaterial,
+                                                                                             wheelMaterial)  # type: agx.ContactMaterial
+    trackWheelContactMaterial.setRestitution(0)
+    trackWheelContactMaterial.setFrictionCoefficient(10)
+    trackWheelContactMaterial.setYoungsModulus(4.0E8)
+    trackWheelContactMaterial.setDamping(0.05)
+    trackWheelContactMaterial.setAdhesion(0.0, 8.0E-3)
+    trackWheelContactMaterial.setUseContactAreaApproach(False)
+
+    trackGroundContactMaterial = simulation().getMaterialManager().getOrCreateContactMaterial(trackMaterial,
+                                                                                              groundMaterial)  # type: agx.ContactMaterial
+    trackGroundContactMaterial.setRestitution(0)
+    trackGroundContactMaterial.setFrictionCoefficient(1.0, agx.ContactMaterial.PRIMARY_DIRECTION)
+    trackGroundContactMaterial.setFrictionCoefficient(0.25, agx.ContactMaterial.SECONDARY_DIRECTION)
+    trackGroundContactMaterial.setSurfaceViscosity(1.0E-6, agx.ContactMaterial.PRIMARY_DIRECTION)
+    trackGroundContactMaterial.setSurfaceViscosity(6.0E-6, agx.ContactMaterial.SECONDARY_DIRECTION)
+
+#trackGroundContactMaterial.setFrictionModel(agx.ConstantNormalForceOrientedBoxFrictionModel(0.5 * taurob.chassis.getMassProperties().getMass(),
+#                                                                                                taurob.chassis.getFrame(),
+#                                                                                                agx.Vec3.X_AXIS(),
+#                                                                                                agx.FrictionModel.DIRECT,
+#                                                                                                False))
+    ground.setMaterial(groundMaterial)
+
+    for track in taurob.tracks:
+        track.setMaterial(trackMaterial)
+        track.setWheelMaterial(wheelMaterial)
         
     agxIO.writeFile("taurob_scene.agx",simulation())
 
@@ -76,7 +109,7 @@ def buildScene():
 init = init_app(
     name=__name__,
     scenes=[(buildScene, "1")],
-    autoStepping=True,  # Default: False
+    autoStepping=False,  # Default: False
     onInitialized=lambda app: print("App successfully initialized."),
     onShutdown=lambda app: print("App successfully shut down."),
 )
