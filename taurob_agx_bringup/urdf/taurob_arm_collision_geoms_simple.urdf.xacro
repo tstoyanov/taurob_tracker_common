@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+
+<robot
+  xmlns:xacro="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+  
+  <macro name="arm_link_0_collision_geom_marco">
+    <!--Lower block-->
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.1 0.1 0.08" />
+      </geometry>
+      <material name="DarkGrey">
+        <color rgba="0.6 0.6 0.6 1"/>
+      </material>
+    </collision>
+    <!--Rounded part-->
+    <collision>
+      <origin xyz="-0.0265 0 0.055" rpy="${pi*0.5} 0 ${pi*0.5}"/>
+      <geometry>
+        <cylinder radius="0.048" length="0.043" />
+      </geometry>
+    </collision>
+    <!--Angled block-->
+    <collision>
+      <origin xyz="0.02 0.0 0.06" rpy="0 ${pi*-0.18} 0" />
+      <geometry>
+        <box size="0.01 0.1 0.1" />
+      </geometry>1#
+    </collision>
+  </macro>  
+  
+  <macro name="arm_link_1_collision_geom_marco">
+    <collision>
+      <origin xyz="-0.045 ${0.651*0.5 -0.05}  ${0.0225+0.016}" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.09} ${0.651 - 0.1*2}  0.104" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="-0.045  ${0.651-0.1}  0.0225" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.09} ${0.1}  0.136" />
+      </geometry>
+    </collision>    
+    <collision>
+      <origin xyz="-0.045  ${+0.0}  0.0225" rpy="0 0 0" />
+      <geometry>
+        <box size="${0.09} ${0.1}  0.136" />
+      </geometry>
+    </collision>    
+  </macro>  
+  
+  <macro name="arm_link_2_collision_geom_marco">
+    <collision>
+      <origin xyz="0.0365 ${-0.5125*0.5 + 0.048} 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.073 ${0.5125} 0.086" />
+      </geometry>
+    </collision>
+  </macro>  
+  
+  <macro name="arm_link_3_collision_geom_simple_eef__marco">
+    <collision>
+      <origin xyz="0.045 ${-0.208*0.5 + 0.03919} 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.07 ${0.208} 0.091" />
+      </geometry>
+    </collision>
+  </macro>  
+  
+  <macro name="arm_link_3_collision_geom_gripper_marco">
+    <collision>
+        <origin xyz=" ${-0.1518*0.5 + 0.03233} 0.04 0.0225" rpy="0 0 0" />
+        <geometry>
+          <box size=" ${0.1518} 0.07893 0.09334" />
+        </geometry>
+    </collision>
+  </macro>
+
+  <macro name="arm_link_4_collision_geom_marco">
+    <collision>
+      <origin xyz="-0.06 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.12 0.05 0.05" />
+      </geometry>
+    </collision>
+    <collision>
+      <origin xyz="-0.07 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.06 ${0.13} 0.04" />
+      </geometry>
+    </collision>
+  </macro> 
+  
+  <macro name="gripper_link_1_collision_geom_marco">
+    <!--Use simple geom below instead of two box meshes-->
+    <!--
+    <collision>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="package://taurob_arm_description/meshes/tgripper_link_1.stl"/>
+      </geometry>
+    </collision>
+    -->    
+    <collision>
+      <origin xyz="0.04 0.0 -0.035" rpy="0 0 0" />
+      <geometry>
+        <box size="0.07 0.01 0.08" />
+      </geometry>
+    </collision>
+  </macro>  
+
+  <macro name="gripper_link_2_collision_geom_marco">
+    <collision>
+      <origin xyz="0.07 -0.025 0.0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.10 0.01 0.055" />
+      </geometry>
+    </collision>
+  </macro>
+  
+</robot>

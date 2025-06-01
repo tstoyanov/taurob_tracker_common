@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="taurob_tracker">
+  <xacro:arg name="tracks" default="false"/> <!-- create agx interfaces for the track motors? -->
+
+  <xacro:property name="flipper_offset_x" value="0.205" />
+  <xacro:property name="flipper_offset_y" value="0.15" />
+  <xacro:property name="flipper_offset_z" value="0.099" />
+  <xacro:property name="angle_deg" value="45" />
+  <xacro:property name="mpi" value="3.141519" />
+
+  <xacro:include filename="$(find taurob_agx_bringup)/urdf/tracker_chassis.urdf.xacro" />
+
+  <!-- include the chasis -->
+  <xacro:tracker_chassis_macro />
+  <xacro:include filename="$(find taurob_agx_bringup)/urdf/taurob_arm_collision_geoms_simple.urdf.xacro" />
+  <xacro:include filename="$(find taurob_agx_bringup)/urdf/taurob_arm_macros.urdf.xacro" />
+
+  <!-- include the arm -->
+  <xacro:taurob_arm_simple_eef_macro parent="chassis_link">
+    <origin xyz="0.0 0 0.0" rpy="0 0 ${mpi/2}"/>
+  </xacro:taurob_arm_simple_eef_macro>
+
+  <!-- Define interfaces for agx -->
+  <xacro:include filename="$(find taurob_agx_bringup)/urdf/taurob.agx_ros2_control.xacro"/>
+  <xacro:taurob_agx_ros2_control tracks="$(arg tracks)"/>
+
+</robot>

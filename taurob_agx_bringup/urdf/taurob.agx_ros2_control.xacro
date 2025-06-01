@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="taurob_agx_ros2_control" params="tracks:='false'">
+    
+    <ros2_control name="TaurobHardwareInterface" type="system">
+      <hardware>
+        <plugin>agx_sim_ros2/AGXHardwareInterface</plugin>
+      </hardware>
+
+        <xacro:macro name="configure_joint" params="joint_name initial_position min_vel max_vel">
+          <joint name="${joint_name}">
+            <param name="agx_name">${joint_name}</param>
+            <param name="sign">1</param>
+            <command_interface name="velocity">
+              <param name="min">${min_vel}</param>
+              <param name="max">${max_vel}</param>
+            </command_interface>
+            <state_interface name="position">
+              <param name="initial_value">${initial_position}</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+          </joint>
+        </xacro:macro>
+
+        <xacro:configure_joint joint_name="flipper_joint" initial_position="0.0" min_vel="-2.0" max_vel="2.0"/>
+        <xacro:configure_joint joint_name="arm_joint_0" initial_position="0.0" min_vel="-2.0" max_vel="2.0"/>
+        <xacro:configure_joint joint_name="arm_joint_1" initial_position="0.0" min_vel="-2.0" max_vel="2.0"/>
+        <xacro:configure_joint joint_name="arm_joint_2" initial_position="0.0" min_vel="-2.0" max_vel="2.0"/>
+        <xacro:configure_joint joint_name="arm_joint_3" initial_position="0.0" min_vel="-2.0" max_vel="2.0"/>
+        
+    </ros2_control>
+  </xacro:macro>
+</robot>
