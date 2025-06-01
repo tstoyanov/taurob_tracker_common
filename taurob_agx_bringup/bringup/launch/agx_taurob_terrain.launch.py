@@ -44,9 +44,9 @@ def generate_launch_description():
             " ",
             PathJoinSubstitution(
                 [
-                    FindPackageShare("panda_agx_bringup"),
+                    FindPackageShare("taurob_agx_bringup"),
                     "urdf",
-                    "panda_arm.urdf.xacro",
+                    "taurob_tracker.urdf.xacro",
                 ]
             ),
         ]
@@ -55,15 +55,15 @@ def generate_launch_description():
     
     robot_controllers = PathJoinSubstitution(
         [
-            FindPackageShare("panda_agx_bringup"),
+            FindPackageShare("taurob_agx_bringup"),
             "config",
-            "franka_controllers.yaml",
+            "taurob_controllers.yaml",
         ]
     )
 
     mesh_pkg_path_content = PathJoinSubstitution(
         [
-            FindPackagePrefix("franka_gazebo"), 
+            FindPackagePrefix("taurob_agx_bringup"), 
             "share"
         ]     
     )
@@ -71,9 +71,9 @@ def generate_launch_description():
     
     scene_file_contents = PathJoinSubstitution(
         [
-            FindPackageShare("panda_agx_bringup"),
+            FindPackageShare("taurob_agx_bringup"),
             "launch",
-            "pick_scene.agx",
+            "taurob_scene.agx",
         ]
     )
     scene_file = {"scene_file": scene_file_contents}
@@ -111,6 +111,13 @@ def generate_launch_description():
         executable="spawner",
         arguments=["joint_trajectory_controller", "--controller-manager", "/controller_manager"],
     )
+    
+    ddrive_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
+    )
+
 
     # Delay rviz start after `joint_state_broadcaster`
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -124,7 +131,7 @@ def generate_launch_description():
     delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=joint_state_broadcaster_spawner,
-            on_exit=[robot_controller_spawner],
+            on_exit=[robot_controller_spawner,ddrive_controller_spawner],
         )
     )
 
