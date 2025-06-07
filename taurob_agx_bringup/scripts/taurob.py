@@ -125,6 +125,21 @@ TrackModelDescription = {
     ],
 }
 
+# Given e.g., fullName = "hinge compliance rotational" this function converts the
+# string to functionName = "setHingeComplianceRotational" and verifies that method
+# is present in type( instance ).
+def invokePropertyFunction(instance, fullName, value):
+    functionName = 'set' + fullName.title().replace(' ', '')
+    if functionName not in type(instance).__dict__:
+        print('Unable to find function "%s" in "%s". Ignoring "%s".' % (functionName, type(instance).__name__, fullName))
+        return
+
+    # This doesn't work in general with multiple arguments, so handling some
+    # cases explicitly.
+    if type(value) is agx.RangeReal:
+        getattr(instance, functionName)(value.lower(), value.upper())
+    else:
+        getattr(instance, functionName)(value)
 def get(name: str, desc: dict, model: dict):
     return desc.get(name, model[name])
 
@@ -268,31 +283,157 @@ class Taurob():
 
     agxOSG.createVisual(assembly, agxPython.getContext().environment.getSceneRoot())
 
-    chassisBaseHalfExtents = kwargs.get('size', agx.Vec3(4, 2, 1)) * 0.5
-    chassisTopHalfExtents = agx.Vec3(0.8 * chassisBaseHalfExtents.x(),
-                                     0.8 * chassisBaseHalfExtents.y(),
-                                     1.0 * chassisBaseHalfExtents.z())
+    self.chassis = assembly.getRigidBody('chassis_link')
+    agxOSG.setDiffuseColor(agxOSG.createVisual(self.chassis, root()), agxRender.Color.LightGreen())
 
-    self.chassis = assembly.getRigidBody('chassis')
-    agxOSG.setDiffuseColor(agxOSG.createVisual(self.chassis, root()),
-                           kwargs.get('color', agxRender.Color.LightGreen()))
+#   trackDefs = [
+#       {
+#           'name': 'right',
+#           'model': TrackModelDescription,
+#           'position': agx.Vec3(-0.051, 0.35, 0)
+#       },
+#       {
+#           'name': 'left',
+#           'model': TrackModelDescription,
+#           'position': agx.Vec3(-0.051, -0.35, 0)
+#       }
+#   ]
+#   self._tracks = OrderedDict()
+#   for trackDef in trackDefs:
+#       trackDef['vehicle'] = self
+#       self._setTrack(Track(**trackDef), trackDef['name'])
 
-    trackDefs = [
-        {
-            'name': 'right',
-            'model': TrackModelDescription,
-            'position': agx.Vec3(-0.051, 0.35, 0)
-        },
-        {
-            'name': 'left',
-            'model': TrackModelDescription,
-            'position': agx.Vec3(-0.051, -0.35, 0)
-        }
-    ]
-    self._tracks = OrderedDict()
-    for trackDef in trackDefs:
-        trackDef['vehicle'] = self
-        self._setTrack(Track(**trackDef), trackDef['name'])
+    #set track and wheel materials
+    trackMaterial = agx.Material('track')
+    wheelMaterial = agx.Material('wheel')
+
+    trackWheelContactMaterial = sim.getMaterialManager().getOrCreateContactMaterial(trackMaterial,
+                                                                                             wheelMaterial)  # type: agx.ContactMaterial
+    trackWheelContactMaterial.setRestitution(0)
+    trackWheelContactMaterial.setFrictionCoefficient(10)
+    trackWheelContactMaterial.setYoungsModulus(4.0E8)
+    trackWheelContactMaterial.setDamping(0.05)
+    trackWheelContactMaterial.setAdhesion(0.0, 8.0E-3)
+    trackWheelContactMaterial.setUseContactAreaApproach(False)
+    
+    #track properties
+    wheel_radius = 0.0925
+    wheel_height = 0.05
+    track_nodes = 120
+    track_width = 0.1
+    track_thickness = 0.015
+
+    #####left track#####
+    left_drive_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    #note: set position relative to?
+    left_drive_rb.setPosition(agx.Vec3(0.37, 0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(left_drive_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Red())
+    left_sprocket = agxVehicle.TrackWheel( agxVehicle.TrackWheel.SPROCKET, wheel_radius, left_drive_rb)
+    
+    left_flipper = assembly.getRigidBody("flipper_link_1")
+    left_flipper_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    left_flipper_rb.setPosition(agx.Vec3(0.051, 0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(left_flipper_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Salmon())
+    left_flipper_idler = agxVehicle.TrackWheel( agxVehicle.TrackWheel.ROLLER, wheel_radius, left_flipper_rb)
+#   left_flipper_hinge.getMotor1D().setEnable(True)  
+#   left_flipper_hinge.getMotor1D().setForceRange(agx.RangeReal(-np.inf,np.inf))
+#   left_flipper_hinge.getLock1D().setEnable(False)
+ 
+    left_back_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    left_back_rb.setPosition(agx.Vec3(-0.441, 0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(left_back_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Salmon())
+    left_back_idler = agxVehicle.TrackWheel( agxVehicle.TrackWheel.IDLER, wheel_radius, left_back_rb)
+#   left_back_hinge.getMotor1D().setEnable(True)  
+#   left_back_hinge.getMotor1D().setForceRange(agx.RangeReal(-np.inf,np.inf))
+#   left_back_hinge.getLock1D().setEnable(False)
+
+    leftTrack = agxVehicle.Track(track_nodes,track_width,track_thickness)
+    leftTrack.add(left_sprocket)
+    leftTrack.add(left_flipper_idler)
+    leftTrack.add(left_back_idler)
+    leftTrack.initialize()
+    for node in leftTrack.nodes():
+      agxOSG.setDiffuseColor(agxOSG.createVisual(node.getRigidBody(), root()), agxRender.Color.Black())
+
+    left_hinge = left_sprocket.attachHinge("left_wheel_joint", self.chassis, 0.0)
+    left_hinge.getMotor1D().setEnable(True)  
+    left_hinge.getMotor1D().setSpeed(1.0)  
+    left_flipper_hinge = left_flipper_idler.attachHinge("left_flipper_wheel_joint", left_flipper, 0.0)
+    left_back_hinge = left_back_idler.attachHinge("left_back_wheel_joint", self.chassis, 0.0)
+
+    ##set track properties##
+#   properties = TrackPropertiesCollection.get('trackProperties1', None)
+#   for name, value in properties.items():
+#       invokePropertyFunction(leftTrack.getProperties(), name, value)
+
+#   internalMergeProperties = TrackInternalMergePropertiesCollection.get('mergeProperties1', None)
+#   for name, value in internalMergeProperties.items():
+#       invokePropertyFunction(leftTrack.getInternalMergeProperties(), name, value)
+    
+    for node in leftTrack.nodes():
+      agxOSG.setDiffuseColor(agxOSG.createVisual(node.getRigidBody(), root()), agxRender.Color.Black())
+    
+    #set weheel materials
+    for wheel in [left_drive_rb, left_flipper_rb, left_back_rb] :
+      agxUtil.setBodyMaterial(wheel, wheelMaterial)
+    
+    leftTrack.setMaterial(trackMaterial)
+    assembly.add(leftTrack)
+
+    ##### Right track ####
+    right_drive_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    #note: set position relative to?
+    right_drive_rb.setPosition(agx.Vec3(0.37, -0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(right_drive_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Red())
+    right_sprocket = agxVehicle.TrackWheel( agxVehicle.TrackWheel.SPROCKET, wheel_radius, right_drive_rb)
+    
+    right_flipper = assembly.getRigidBody("flipper_link_1")
+    right_flipper_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    right_flipper_rb.setPosition(agx.Vec3(0.051, -0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(right_flipper_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Salmon())
+    right_flipper_idler = agxVehicle.TrackWheel( agxVehicle.TrackWheel.IDLER, wheel_radius, right_flipper_rb)
+#   right_flipper_hinge.getMotor1D().setEnable(False)  
+#   right_flipper_hinge.getLock1D().setEnable(False)
+#   right_flipper_hinge.getMotor1D().setForceRange(agx.RangeReal(0,0))
+ 
+    right_back_rb = agx.RigidBody(agxCollide.Geometry(agxCollide.Cylinder(wheel_radius, wheel_height)))
+    right_back_rb.setPosition(agx.Vec3(-0.441, -0.23375, 0.103))
+    agxOSG.setDiffuseColor(agxOSG.createVisual(right_back_rb.getGeometries()[0], root(), 1.0), agxRender.Color.Salmon())
+    right_back_idler = agxVehicle.TrackWheel( agxVehicle.TrackWheel.IDLER, wheel_radius, right_back_rb)
+#   right_back_hinge.getMotor1D().setEnable(False)  
+#   right_back_hinge.getLock1D().setEnable(False)
+#   right_back_hinge.getMotor1D().setForceRange(agx.RangeReal(0,0))
+
+    rightTrack = agxVehicle.Track(track_nodes,track_width,track_thickness)
+    rightTrack.add(right_sprocket)
+    rightTrack.add(right_flipper_idler)
+    rightTrack.add(right_back_idler)
+    rightTrack.initialize()
+    for node in rightTrack.nodes():
+      agxOSG.setDiffuseColor(agxOSG.createVisual(node.getRigidBody(), root()), agxRender.Color.Black())
+
+    right_hinge = right_sprocket.attachHinge("right_wheel_joint", self.chassis, 0.0)
+    right_hinge.getMotor1D().setEnable(True)  
+    right_hinge.getMotor1D().setSpeed(1.0)  
+    right_flipper_hinge = right_flipper_idler.attachHinge("right_flipper_wheel_joint", right_flipper, 0.0)
+    right_back_hinge = right_back_idler.attachHinge("right_back_wheel_joint", self.chassis, 0.0)
+
+    ##set track properties##
+#   properties = TrackPropertiesCollection.get('trackProperties1', None)
+#   for name, value in properties.items():
+#       invokePropertyFunction(rightTrack.getProperties(), name, value)
+
+#   internalMergeProperties = TrackInternalMergePropertiesCollection.get('mergeProperties1', None)
+#   for name, value in internalMergeProperties.items():
+#       invokePropertyFunction(rightTrack.getInternalMergeProperties(), name, value)
+#   
+#   for node in rightTrack.nodes():
+#     agxOSG.setDiffuseColor(agxOSG.createVisual(node.getRigidBody(), root()), agxRender.Color.Black())
+    
+    #set weheel materials
+    for wheel in [right_drive_rb, right_flipper_rb, right_back_rb] :
+      agxUtil.setBodyMaterial(wheel, wheelMaterial)
+    assembly.add(rightTrack)
 
     sim.add(assembly)
 
@@ -300,36 +441,12 @@ class Taurob():
     self.locks = [c.asLockJoint() for c in all_c if c.asLockJoint()]
     
 
-  ############  methods  ################
-  @property
-  def tracks(self) -> [Track]:
-      return [track for _, track in self._tracks.items()]
-
-  def getTrack(self, name: str) -> Track:
-      try:
-          return self._tracks[name]
-      except:  # noqa
-          return None
-
-  def _setTrack(self, track: Track, name: str):
-      if name in self._tracks:
-          self._setEnableCollisions(self._tracks[name], True)
-          self.remove(self._tracks[name])
-
-      self._tracks[name] = track
-
-      if track:
-          self._setEnableCollisions(self._tracks[name], False)
-          self.assembly.add(track)
-
-  def _setEnableCollisions(self, track: Track, enable: bool):
-      track.setEnableCollisions(self.chassis, enable)
-
+  ##### for arm ####
   def enable_motors(self, enable: bool) -> None:
       [j.motor.setEnable(enable) for j in self.joints]
 
   def enable_locks(self, enable: bool) -> None:
-      [j.lock.setEnable(enable) for j in self.joints]
+    [j.lock.setEnable(enable) for j in self.joints]
 
   def get_joint_names(self) -> list:
       return [j.name for j in self.joints]

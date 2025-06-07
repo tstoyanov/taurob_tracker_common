@@ -142,7 +142,7 @@
     </collision>
   </link>
   <!-- active wheels -->
-  <link name="left_wheel">
+  <!--link name="left_wheel">
     <visual>
       <origin rpy="1.5707963267948966 0 0" xyz="0.0 0.0 0.0"/>
       <geometry>
@@ -187,7 +187,7 @@
     <axis xyz="0 1 0"/>
     <parent link="chassis_link"/>
     <child link="right_wheel"/>
-  </joint>
+  </joint-->
   <macro name="arm_link_0_collision_geom_marco">
     <!--Lower block-->
     <collision>
