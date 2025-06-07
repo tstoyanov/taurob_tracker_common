@@ -57,8 +57,8 @@ TrackPropertiesCollection = {
         'nodes to wheels merge threshold': -0.1,
         'nodes to wheels split threshold': -0.15,
         'num nodes included in average direction': 5,
-        'min stabilizing hinge normal force': 50.0,
-        'stabilizing hinge friction parameter': 4.0E-3
+        'min stabilizing hinge normal force': 100.0,
+        'stabilizing hinge friction parameter': 4.0E-6
     }
 }
 
@@ -66,7 +66,7 @@ TrackPropertiesCollection = {
 # Referenced as: TrackModelDescription { 'internalMergeProperties': 'mergeProperties1' }.
 TrackInternalMergePropertiesCollection = {
     'mergeProperties1': {
-        'enable merge': True,
+        'enable merge': False,
         'num nodes per merge segment': 3,
         'contact reduction': agxVehicle.TrackInternalMergeProperties.AGGRESSIVE,
         'enable lock to reach merge condition': True,
@@ -164,19 +164,19 @@ def buildScene2():
 #   assembly.add(chassis) 
     
     #track properties
-    wheel_radius = 0.1925
-    wheel_height = 0.55
-    track_nodes = 120
-    track_width = wheel_height
+    wheel_radius = 0.0925
+    wheel_height = 0.05
+    track_nodes = 100
+    track_width = 2*wheel_height
     track_thickness = 0.01
     node_offset = 0
 
     left_drive_wheel = buildWheel(wheel_radius,wheel_height,
-        agxVehicle.TrackWheel.SPROCKET,agx.Vec3(1., 0., 0.))
+        agxVehicle.TrackWheel.SPROCKET,agx.Vec3(0.37, 0.23375, 0.103))
     left_back_wheel = buildWheel(wheel_radius,wheel_height,
-        agxVehicle.TrackWheel.IDLER,agx.Vec3(0., 0., 0.))
+        agxVehicle.TrackWheel.IDLER,agx.Vec3(-0.441, 0.23375, 0.103))
     left_flipper_wheel = buildWheel(wheel_radius,wheel_height,
-        agxVehicle.TrackWheel.ROLLER,agx.Vec3(0.5, 0., 0.10))
+        agxVehicle.TrackWheel.ROLLER,agx.Vec3(0.051, 0.23375, 0.103))
     
     left_track = agxVehicle.Track(track_nodes,track_width,track_thickness,node_offset)
     left_track.add(left_drive_wheel)

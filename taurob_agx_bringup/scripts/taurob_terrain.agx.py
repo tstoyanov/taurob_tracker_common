@@ -55,7 +55,7 @@ def buildScene():
 
     # The robot
     #
-    taurob = Taurob(sim=simulation(), disable_self_collision=False)
+    taurob = Taurob(sim=simulation(), disable_self_collision=True)
     #panda = Panda(simulation(), use_tool=True, disable_self_collision=False)
 
     # sets maximum torque
@@ -73,7 +73,6 @@ def buildScene():
     #set contact materials
     trackMaterial = agx.Material('track')
     groundMaterial = agx.Material('ground')
-    ground.setMaterial(groundMaterial)
 
     trackGroundContactMaterial = simulation().getMaterialManager().getOrCreateContactMaterial(trackMaterial,
                                                                                               groundMaterial)  # type: agx.ContactMaterial
@@ -88,12 +87,22 @@ def buildScene():
                                                                                                 agx.Vec3.X_AXIS(),
                                                                                                 agx.FrictionModel.DIRECT,
                                                                                                 False))
+    
+    ground.setMaterial(groundMaterial)
 
+    for track in taurob.tracks:
+        track.setMaterial(trackMaterial)
+    
 
-#   for track in taurob.tracks:
-#       track.setMaterial(trackMaterial)
-#       track.setWheelMaterial(wheelMaterial)
-        
+    taurob.enable_motors(True)
+    joint_names = taurob.get_joint_names()
+    joint_positions = taurob.get_joint_velocities()
+    for jp,jn in zip(joint_positions, joint_names):
+      print ("joint",jp,"at",jn)
+
+    joint_positions[0] = -0.5
+    taurob.set_joint_velocities(joint_positions)
+
     agxIO.writeFile("taurob_scene.agx",simulation())
 
 def onAppInitialized(app: agxOSG.ExampleApplication):
