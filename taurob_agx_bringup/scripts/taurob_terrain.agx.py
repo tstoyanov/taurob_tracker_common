@@ -24,6 +24,7 @@ import agxRender
 import agxUtil
 import agxIO
 import agxCable
+import agxTerrain
 
 from agxPythonModules.utils.environment import simulation, init_app, application, root
 from agxPythonModules.robots.panda import Panda  # noqa
@@ -31,6 +32,7 @@ from agxPythonModules.robots.panda import Panda  # noqa
 from taurob import Taurob
 
 import math
+from math import pi, radians, sin, cos, copysign
 import numpy as np
 
 from collections import namedtuple
@@ -46,13 +48,72 @@ def disable_collisions(panda, linkA, linkB):
 def buildScene():
 
     #add ground
-    ground = agxCollide.Geometry(agxCollide.Box(30, 30, 0.1))
+    ground = agxCollide.Geometry(agxCollide.Box(30, 3, 0.1))
     ground.setPosition(agx.Vec3(0, 0, -0.1))
     ground.setName("ground")
     simulation().add(ground)
     ground_node = agxOSG.createVisual(ground, root())
     agxOSG.setDiffuseColor(ground_node, agxRender.Color.Black())
+    
+    groundGeometries = []
 
+    def createGroundGeometry(**kwargs) -> agxCollide.Geometry:
+        geometry = agxCollide.Geometry(kwargs['shape'])
+        geometry.setTransform(kwargs.get('transform', agx.AffineMatrix4x4()))
+        simulation().add(geometry)
+        agxOSG.setDiffuseColor(agxOSG.createVisual(geometry, root(), 1.5),
+                               kwargs.get('color', agxRender.Color.Brown()))
+        groundGeometries.append(geometry)
+        return geometry
+
+    def buildHump(alpha,a,h,offset):
+      createGroundGeometry(shape=agxCollide.Box(a, 1, h),
+                         transform=agx.AffineMatrix4x4.rotate(radians(-alpha), agx.Vec3.Y_AXIS()) *
+                         agx.AffineMatrix4x4.translate(offset, 0, 0),
+                         color=agxRender.Color.DarkCyan())
+      createGroundGeometry(shape=agxCollide.Box(a, 1, h),
+                         transform=agx.AffineMatrix4x4.rotate(radians(alpha), agx.Vec3.Y_AXIS()) *
+                         agx.AffineMatrix4x4.translate(offset+cos(radians(alpha))*(2*a-h), 0, 0),
+                         color=agxRender.Color.DarkCyan())
+
+    buildHump(15,1,0.1,1)
+    buildHump(20,1,0.1,4.5)
+    buildHump(30,1,0.1,8)
+    buildHump(45,1,0.1,11)
+    buildHump(55,1,0.1,14)
+
+    def buildStairs(offset,stepHeight):
+      #steps
+      l=0.5+3*stepHeight
+      #NOTE size of box is *half extent*
+      createGroundGeometry(shape=agxCollide.Box(l, 1, stepHeight),
+                         transform=agx.AffineMatrix4x4.translate(offset, 0, 0),
+                         color=agxRender.Color.Brown())
+      createGroundGeometry(shape=agxCollide.Box(l-stepHeight, 1, 2*stepHeight),
+                         transform=agx.AffineMatrix4x4.translate(offset, 0, 0),
+                         color=agxRender.Color.Brown())
+      createGroundGeometry(shape=agxCollide.Box(l-2*stepHeight, 1, 3*stepHeight),
+                         transform=agx.AffineMatrix4x4.translate(offset, 0, 0),
+                         color=agxRender.Color.Brown())
+      createGroundGeometry(shape=agxCollide.Box(l-3*stepHeight, 1, 4*stepHeight),
+                         transform=agx.AffineMatrix4x4.translate(offset, 0, 0),
+                         color=agxRender.Color.Brown())
+
+    buildStairs(17.5,0.1)
+    buildStairs(20.5,0.2)
+    buildStairs(25,0.4)
+
+    # the rest is just rough terrain
+    size = 30 #elementSize * (resolution - 1)
+    height = 5.0
+    filename="terrain_height.png"
+    heightField = agxCollide.HeightField.createFromFile(filename, size, size, 0, height)
+    # Create the terrain from a height field, set maximum depth to 5m and add it to the simulation
+    terrain = agxTerrain.Terrain.createFromHeightField(heightField, height)
+    terrain.setPosition(agx.Vec3(42.5,0,-1))
+    simulation().add(terrain)
+
+    
     # The robot
     #
     taurob = Taurob(sim=simulation(), disable_self_collision=True)
@@ -87,12 +148,25 @@ def buildScene():
                                                                                                 agx.Vec3.X_AXIS(),
                                                                                                 agx.FrictionModel.DIRECT,
                                                                                                 False))
-    
     ground.setMaterial(groundMaterial)
+    for groundGeometry in groundGeometries:
+        groundGeometry.setMaterial(groundMaterial)
 
+    terrain.setMaterial(groundMaterial)
+    
     for track in taurob.tracks:
         track.setMaterial(trackMaterial)
-    
+   
+    # Setup a renderer for the terrain. Here we choose to only render the height field but with height coloring
+    renderer = agxOSG.TerrainVoxelRenderer(terrain, root())
+    renderer.setRenderHeights(True, agx.RangeReal(-1.25, 1.25))
+    renderer.setRenderVoxelSolidMass(False)
+    renderer.setRenderVoxelFluidMass(False)
+    renderer.setRenderHeightField(True)
+    renderer.setRenderVoxelBoundingBox(False)
+    renderer.setRenderSoilParticlesMesh(True)
+    simulation().add(renderer)
+ 
 
     taurob.enable_motors(True)
     joint_names = taurob.get_joint_names()
