@@ -152,12 +152,11 @@ def buildScene():
     for groundGeometry in groundGeometries:
         groundGeometry.setMaterial(groundMaterial)
 
-    terrain.setMaterial(groundMaterial)
-    
     for track in taurob.tracks:
         track.setMaterial(trackMaterial)
    
     # Setup a renderer for the terrain. Here we choose to only render the height field but with height coloring
+    terrain.setMaterial(groundMaterial)
     renderer = agxOSG.TerrainVoxelRenderer(terrain, root())
     renderer.setRenderHeights(True, agx.RangeReal(-1.25, 1.25))
     renderer.setRenderVoxelSolidMass(False)
